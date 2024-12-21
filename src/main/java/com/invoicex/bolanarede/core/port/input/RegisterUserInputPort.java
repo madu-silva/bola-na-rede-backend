@@ -4,5 +4,5 @@ import com.invoicex.bolanarede.core.model.User;
 
 public interface RegisterUserInputPort {
 
-    public User registerUser(User user);
+    public User registerUser(final User user);
 }

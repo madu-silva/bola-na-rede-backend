@@ -1,8 +1,8 @@
 package com.invoicex.bolanarede.infrastructure.database.document;
 
 import com.invoicex.bolanarede.infrastructure.database.document.enuns.Role;
-import jakarta.persistence.Id;
 import lombok.Builder;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 

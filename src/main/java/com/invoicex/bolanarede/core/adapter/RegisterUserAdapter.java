@@ -15,8 +15,7 @@ public class RegisterUserAdapter implements RegisterUserInputPort {
     }
 
     @Override
-    public User registerUser(User user) {
-
+    public User registerUser(final User user) {
         return registerUserDBOutputPort.register(user);
     }
 }

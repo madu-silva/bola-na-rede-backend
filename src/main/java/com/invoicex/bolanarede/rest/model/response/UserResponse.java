@@ -3,11 +3,12 @@ package com.invoicex.bolanarede.rest.model.response;
 import lombok.Builder;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Builder
 public class UserResponse {
 
-    private String id;
+    private UUID id;
     private String name;
     private String email;
     private String telephone;
@@ -16,7 +17,7 @@ public class UserResponse {
     public UserResponse() {
     }
 
-    public UserResponse(String id, String name, String email, String telephone, LocalDate dataUpdated) {
+    public UserResponse(UUID id, String name, String email, String telephone, LocalDate dataUpdated) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -24,11 +25,11 @@ public class UserResponse {
         this.dataUpdated = dataUpdated;
     }
 
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 

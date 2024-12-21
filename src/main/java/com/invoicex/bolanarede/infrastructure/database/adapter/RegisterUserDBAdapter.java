@@ -7,6 +7,7 @@ import com.invoicex.bolanarede.infrastructure.database.repositories.UserReposito
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Service
 public class RegisterUserDBAdapter implements RegisterUserDBOutputPort {
@@ -27,6 +28,7 @@ public class RegisterUserDBAdapter implements RegisterUserDBOutputPort {
         return mapper.parseToCore(repository.save(
                 mapper.parseToDocument(
                         user.toBuilder()
+                                .id(UUID.randomUUID())
                                 .dataCreated(LocalDate.now())
                                 .dataUpdated(LocalDate.now())
                                 .build()

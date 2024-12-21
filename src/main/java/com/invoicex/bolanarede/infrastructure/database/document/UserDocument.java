@@ -7,13 +7,14 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Document(collection = "user")
 @Builder
 public class UserDocument {
 
     @Id
-    private String id;
+    private UUID id;
 
     @Field("name")
     private String name;
@@ -36,7 +37,7 @@ public class UserDocument {
     }
 
     public UserDocument(
-            String id,
+            UUID id,
             String name,
             String email,
             String telephone,
@@ -56,11 +57,11 @@ public class UserDocument {
         this.verified = verified;
     }
 
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 

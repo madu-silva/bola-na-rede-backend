@@ -17,13 +17,14 @@ public class ScheduleMapper {
                 .build();
     }
 
-    public ScheduleResponse parseToResponse(Schedule schedullings) {
+    public ScheduleResponse parseToResponse(Schedule schedule) {
 
         return ScheduleResponse.builder()
-                .date(schedullings.getDate())
-                .hour(schedullings.getHour())
-                .status(schedullings.getStatus())
+                .date(schedule.getDate())
+                .hour(schedule.getHour())
+                .status(schedule.getStatus())
                 .build();
     }
+
 
 }

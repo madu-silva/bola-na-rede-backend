@@ -4,5 +4,5 @@ import com.invoicex.bolanarede.core.model.Schedule;
 
 public interface RegisterScheduleInputPort {
 
-    public Schedule registerASchedule(final Schedule schedule);
+    public Schedule registerSchedule(final Schedule schedule);
 }

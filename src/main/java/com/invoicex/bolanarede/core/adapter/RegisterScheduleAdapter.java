@@ -15,7 +15,7 @@ public class RegisterScheduleAdapter implements RegisterScheduleInputPort {
     }
 
     @Override
-    public Schedule registerASchedule(Schedule schedule) {
-        return dbOutputPort.registerASchedule(schedule);
+    public Schedule registerSchedule(Schedule schedule) {
+        return dbOutputPort.registerSchedule(schedule);
     }
 }

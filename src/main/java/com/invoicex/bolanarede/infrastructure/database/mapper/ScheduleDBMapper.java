@@ -10,6 +10,7 @@ public class ScheduleDBMapper {
     public ScheduleDocument parseToDocument(final Schedule schedule) {
         return ScheduleDocument.builder()
                 .id(schedule.getId())
+                .userId(schedule.getUserId())
                 .date(schedule.getDate())
                 .hour(schedule.getHour())
                 .status(schedule.getStatus())
@@ -19,6 +20,7 @@ public class ScheduleDBMapper {
     public Schedule parseToCore(final ScheduleDocument scheduleDocument) {
         return Schedule.builder()
                 .id(scheduleDocument.getId())
+                .userId(scheduleDocument.getUserId())
                 .date(scheduleDocument.getDate())
                 .hour(scheduleDocument.getHour())
                 .status(scheduleDocument.getStatus())

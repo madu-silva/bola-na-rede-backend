@@ -1,0 +1,58 @@
+
+name: Deploy to Magalu Cloud
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout do código
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Configurar conexão SSH
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts
+      # 3. Verificar e instalar o Docker na VM remota
+      - name: Verify and install Docker
+        run: |
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
+            if ! command -v docker > /dev/null; then
+              echo 'Docker not found. Installing...';
+              curl -fsSL https://get.docker.com -o get-docker.sh;
+              sh get-docker.sh;
+              sudo usermod -aG docker $USER;
+              echo 'Docker installed.';
+            else
+              echo 'Docker is already installed.';
+            fi
+          "
+      # 4. Buildar a imagem Docker e criar uma tag
+      - name: Build and Tag Docker Image
+        run: |
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
+            cd /home/${{ secrets.SSH_USER }};
+            rm -rf project || true; mkdir project;
+          "
+          scp -r ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/project
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
+            cd /home/${{ secrets.SSH_USER }}/project;
+            docker build -t bola-na-rede:latest .;
+            docker tag bola-na-rede:latest bola-na-rede:\$(date +'%Y%m%d%H%M');
+          "
+      # 5. Subir o container
+      - name: Run Docker Container
+        run: |
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
+            docker stop bola-na-rede || true && docker rm bola-na-rede || true;
+            docker run -d --name bola-na-rede -p 8080:8080 bola-na-rede:latest;
+          "

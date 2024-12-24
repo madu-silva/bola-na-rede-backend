@@ -48,7 +48,7 @@ jobs:
 
           # Copia os arquivos do repositório para o diretório project
           echo "Copiando arquivos para o servidor remoto..."
-          scp -r ./ ${SSH_USER}@${SSH_HOST}:~/project
+          scp -r ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/project
           if [ $? -ne 0 ]; then
             echo "Erro ao transferir os arquivos com SCP!"
             exit 1
@@ -66,7 +66,6 @@ jobs:
             fi
             echo 'Imagem Docker construída com sucesso!';
           "
-      
 
       # 5. Subir o container
       - name: Run Docker Container

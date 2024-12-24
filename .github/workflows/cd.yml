@@ -49,7 +49,7 @@ jobs:
           ssh "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" "
             cd /home/\${{ secrets.SSH_USER }}/project;
             docker build -t bola-na-rede:0.0.1 .;
-            docker tag bola-na-rede:0.0.1 bola-na-rede:\$(date +'%Y%m%d%H%M');
+            docker tag bola-na-rede:0.0.1 bola-na-rede:0.0.1;
           "
 
       # 5. Subir o container

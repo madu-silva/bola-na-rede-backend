@@ -41,13 +41,13 @@ jobs:
       - name: Build and Tag Docker Image
         run: |
           ssh "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" "
-            cd /home/\${{ secrets.SSH_USER }};
+            cd /home/${{ secrets.SSH_USER }};
             rm -rf project || true;
             mkdir project;
           "
           scp -r ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/project
           ssh "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" "
-            cd /home/\${{ secrets.SSH_USER }}/project;
+            cd /home/${{ secrets.SSH_USER }}/project;
             docker build -t bola-na-rede:0.0.1 .;
           "
 

@@ -46,13 +46,13 @@ jobs:
           scp -r ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/project
           ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
             cd /home/${{ secrets.SSH_USER }}/project;
-            docker build -t bola-na-rede:latest .;
-            docker tag bola-na-rede:latest bola-na-rede:\$(date +'%Y%m%d%H%M');
+            docker build -t bola-na-rede:0.0.1 .;
+            docker tag bola-na-rede:0.0.1 bola-na-rede:\$(date +'%Y%m%d%H%M');
           "
       # 5. Subir o container
       - name: Run Docker Container
         run: |
           ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
             docker stop bola-na-rede || true && docker rm bola-na-rede || true;
-            docker run -d --name bola-na-rede -p 8080:8080 bola-na-rede:latest;
+            docker run -d --name bola-na-rede -p 8080:8080 bola-na-rede:0.0.1;
           "

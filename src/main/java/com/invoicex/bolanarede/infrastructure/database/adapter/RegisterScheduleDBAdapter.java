@@ -19,12 +19,13 @@ public class RegisterScheduleDBAdapter implements RegisterScheduleDBOutputPort {
     }
 
     @Override
-    public Schedule registerASchedule(Schedule schedule) {
+    public Schedule registerSchedule(Schedule schedule) {
 
         return
                 mapper.parseToCore(repository.save(
                                 mapper.parseToDocument(
                                         schedule.toBuilder()
+                                                .userId(schedule.getUserId())
                                                 .status(Scheduling.SCHEDULED)
                                                 .build())
                         )

@@ -1,4 +1,15 @@
 services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '8080:8080'
+    depends_on:
+      - mongodb
+    environment:
+      - CONEXAO_MONGO_ATLAS=${{ secrets.CONEXAO_MONGO_ATLAS }}
+
   mongodb:
     image: mongodb/mongodb-community-server
     ports:

@@ -48,11 +48,7 @@ jobs:
 
           # Copia os arquivos do repositório para o diretório project
           echo "Copiando arquivos para o servidor remoto..."
-          scp -r ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/project
-          if [ $? -ne 0 ]; then
-            echo "Erro ao transferir os arquivos com SCP!"
-            exit 1
-          fi
+          rsync -avz ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/project
           echo "Arquivos copiados com sucesso para o servidor remoto."
 
           # Construa a imagem Docker no diretório project
@@ -60,10 +56,6 @@ jobs:
           ssh "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" "
             cd ~/project;
             docker build -t bola-na-rede:0.0.1 .;
-            if [ \$? -ne 0 ]; then
-              echo 'Erro ao construir a imagem Docker!';
-              exit 1;
-            fi
             echo 'Imagem Docker construída com sucesso!';
           "
 

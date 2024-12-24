@@ -23,9 +23,10 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts
 
-      # 3. Verificar e instalar o Docker na VM remota
-      - name: Verify and install Docker
+      # 3. Verificar e instalar o Docker e rsync na VM remota
+      - name: Verify and install Docker and rsync
         run: |
+          # Verifica e instala o Docker, se necessário
           ssh "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" "
             if ! command -v docker > /dev/null; then
               echo 'Docker not found. Installing...';
@@ -35,6 +36,17 @@ jobs:
               echo 'Docker installed.';
             else
               echo 'Docker is already installed.';
+            fi
+          "
+
+          # Verifica e instala o rsync, se necessário
+          ssh "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" "
+            if ! command -v rsync > /dev/null; then
+              echo 'rsync not found. Installing...';
+              sudo apt-get update && sudo apt-get install -y rsync;
+              echo 'rsync installed.';
+            else
+              echo 'rsync is already installed.';
             fi
           "
 
@@ -55,6 +67,10 @@ jobs:
           echo "Construindo a imagem Docker no servidor remoto..."
           ssh "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" "
             cd ~/project;
+            if [ ! -f Dockerfile ]; then
+              echo 'Dockerfile não encontrado no diretório!';
+              exit 1;
+            fi
             docker build -t bola-na-rede:0.0.1 .;
             echo 'Imagem Docker construída com sucesso!';
           "
@@ -63,6 +79,6 @@ jobs:
       - name: Run Docker Container
         run: |
           ssh "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" "
-            docker stop bola-na-rede || true && docker rm bola-na-rede || true;
-            docker run -d --name bola-na-rede -p 8080:8080 bola-na-rede:0.0.1;
+            sudo docker stop bola-na-rede || true && sudo docker rm bola-na-rede || true;
+            sudo docker run -d --name bola-na-rede -p 8080:8080 bola-na-rede:0.0.1;
           "

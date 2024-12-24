@@ -40,15 +40,34 @@ jobs:
       # 4. Buildar a imagem Docker e criar uma tag
       - name: Build and Tag Docker Image
         run: |
-          ssh "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" "
-            cd /home/${{ secrets.SSH_USER }};
-            rm -rf project || true;
-            mkdir project;
-          "
-          scp -r ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/project
-          ssh "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" "
-            cd /home/${{ secrets.SSH_USER }}/project;
+          SSH_USER="${{ secrets.SSH_USER }}"
+          SSH_HOST="${{ secrets.SSH_HOST }}"
+          PROJECT_DIR="/home/${SSH_USER}/project"
+          
+          # Conectar via SSH e preparar o diretório do projeto
+          echo "Preparando diretório no servidor remoto..."
+          ssh "${SSH_USER}@${SSH_HOST}" "mkdir -p ${PROJECT_DIR} && rm -rf ${PROJECT_DIR}/*"
+          
+          # Copiar os arquivos para o servidor remoto usando SCP
+          echo "Transferindo arquivos para o servidor remoto..."
+          scp -rq ./ ${SSH_USER}@${SSH_HOST}:${PROJECT_DIR}
+          
+          # Verificar se a cópia foi bem-sucedida
+          if [ $? -ne 0 ]; then
+            echo "Erro ao transferir os arquivos com SCP!"
+            exit 1
+          fi
+          
+          # Construir a imagem Docker no servidor remoto
+          echo "Construindo a imagem Docker no servidor remoto..."
+          ssh "${SSH_USER}@${SSH_HOST}" "
+            cd ${PROJECT_DIR} || exit;
             docker build -t bola-na-rede:0.0.1 .;
+            if [ \$? -ne 0 ]; then
+              echo 'Erro ao construir a imagem Docker!';
+              exit 1;
+            fi
+            echo 'Imagem Docker construída com sucesso!';
           "
 
       # 5. Subir o container

@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - criacao-cd
 
 jobs:
   deploy:
@@ -31,7 +30,7 @@ jobs:
               echo 'Docker not found. Installing...';
               curl -fsSL https://get.docker.com -o get-docker.sh;
               sh get-docker.sh;
-              sudo usermod -aG docker $USER;
+              sudo usermod -aG docker \$USER;
               echo 'Docker installed.';
             else
               echo 'Docker is already installed.';
@@ -41,43 +40,24 @@ jobs:
       # 4. Buildar a imagem Docker e criar uma tag
       - name: Build and Tag Docker Image
         run: |
-          SSH_USER="${{ secrets.SSH_USER }}"
-          SSH_HOST="${{ secrets.SSH_HOST }}"
-          PROJECT_DIR="/home/${SSH_USER}/project"
-          
-          # Testar conexão SSH
-          echo "Verificando conexão SSH com o servidor remoto..."
-          ssh -o ConnectTimeout=10 "${SSH_USER}@${SSH_HOST}" "exit"
-          if [ $? -ne 0 ]; then
-            echo "Falha na conexão SSH! Verifique as credenciais ou a conectividade com o servidor."
-            exit 1
-          fi
-          echo "Conexão SSH bem-sucedida!"
-          
-          # Conectar via SSH e preparar o diretório do projeto
-          echo "Preparando diretório no servidor remoto..."
-          ssh "${SSH_USER}@${SSH_HOST}" "mkdir -p ${PROJECT_DIR} && rm -rf ${PROJECT_DIR}/*"
-          
-          # Verificar se o comando SSH para preparar o diretório foi bem-sucedido
-          if [ $? -ne 0 ]; then
-            echo "Erro ao preparar o diretório no servidor remoto!"
-            exit 1
-          fi
-          
-          # Copiar os arquivos para o servidor remoto usando SCP
-          echo "Transferindo arquivos para o servidor remoto..."
-          scp -rq ./ ${SSH_USER}@${SSH_HOST}:${PROJECT_DIR}
-          
-          # Verificar se a cópia foi bem-sucedida
+          # Cria o diretório project no servidor remoto se não existir
+          echo "Criando o diretório 'project' no servidor remoto..."
+          ssh "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" "mkdir -p ~/project"
+          echo "Diretório 'project' criado ou já existente no servidor remoto."
+
+          # Copia os arquivos do repositório para o diretório project
+          echo "Copiando arquivos para o servidor remoto..."
+          scp -r ./ ${SSH_USER}@${SSH_HOST}:~/project
           if [ $? -ne 0 ]; then
             echo "Erro ao transferir os arquivos com SCP!"
             exit 1
           fi
-          
-          # Construir a imagem Docker no servidor remoto
+          echo "Arquivos copiados com sucesso para o servidor remoto."
+
+          # Construa a imagem Docker no diretório project
           echo "Construindo a imagem Docker no servidor remoto..."
-          ssh "${SSH_USER}@${SSH_HOST}" "
-            cd ${PROJECT_DIR} || exit;
+          ssh "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" "
+            cd ~/project;
             docker build -t bola-na-rede:0.0.1 .;
             if [ \$? -ne 0 ]; then
               echo 'Erro ao construir a imagem Docker!';
@@ -87,7 +67,7 @@ jobs:
           "
       
 
-        # 5. Subir o container
+      # 5. Subir o container
       - name: Run Docker Container
         run: |
           ssh "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" "
